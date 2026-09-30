@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>edgenote</title>
+  <meta name="description" content="A lightweight Python package designed to mitigate the Lost in the Middle attention degradation problem in Large Language Models.">
+  <meta name="keywords" content="edgenote, python, llm, lost-in-the-middle, prompt-engineering, rag, context-window, transformers">
+  <meta name="author" content="Md Tareq Shah Alam">
+
+  <!-- Canonical & Open Graph -->
+  <link rel="canonical" href="https://edgenote.github.io">
+  <meta property="og:title" content="edgenote — Edge-Pinning Python Package for LLMs">
+  <meta property="og:description" content="Mitigates the Lost in the Middle attention problem by anchoring critical constraints and context at prompt boundaries.">
+  <meta property="og:url" content="https://edgenote.github.io">
+  <meta property="og:type" content="website">
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="shortcut icon" href="favicon.png">
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <!-- Background Decorative Grid & Glow -->
+  <div class="background-grid"></div>
+  <div class="background-glow"></div>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="#" class="brand" aria-label="edgenote home">
+        <img src="logo.png" alt="edgenote logo" class="brand-logo">
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#simulator">Simulator</a></li>
+        <li><a href="#problem">The Problem</a></li>
+        <li><a href="#capabilities">Capabilities</a></li>
+        <li><a href="#benchmark">Benchmark</a></li>
+        <li><a href="#quickstart">Quickstart</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="https://pypi.org/project/edgenote/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0L1.75 5.92v12.16L12 24l10.25-5.92V5.92L12 0zm-.75 2.14l7.63 4.41-3.32 1.92-7.63-4.41 3.32-1.92zm-8.25 5.4l7.5 4.34v8.13l-7.5-4.34V7.54zm16.5 8.13l-7.5 4.34v-8.13l7.5-4.34v8.13z" />
+          </svg>
+          <span>PyPI</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main>
+    <section class="hero" id="overview">
+      <div class="container">
+
+        <div class="hero-pill">
+          <span class="dot"></span>
+          <span>Python Package for LLM Prompt Geometry</span>
+        </div>
+
+        <h1>
+          Fight the <span class="gradient-text">Lost in the Middle</span> problem in LLMs.
+        </h1>
+
+        <p class="hero-subtitle">
+          A dedicated Python package that mitigates attention degradation in long prompts by anchoring critical constraints and high-scoring context at context window boundaries.
+        </p>
+
+        <!-- Command Bar -->
+        <div class="install-bar">
+          <span class="install-text">
+            <span class="prefix">$ </span>
+            <span id="installCommandText">pip install edgenote</span>
+          </span>
+          <button id="copyInstallBtn" class="copy-btn" aria-label="Copy install command">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>Copy</span>
+          </button>
+        </div>
+
+        <!-- Interactive Simulator Card -->
+        <div class="simulator-container" id="simulator">
+          <div class="simulator-header">
+            <div class="simulator-title">
+              <span class="simulator-status-dot"></span>
+              <span>Attention Topology Diagnostic</span>
+            </div>
+
+            <!-- Mode Switcher -->
+            <div class="mode-toggle">
+              <button id="modeLinear" class="mode-btn">Linear Context (Vulnerable)</button>
+              <button id="modeEdgenote" class="mode-btn active">edgenote (Edge-Pinned)</button>
+            </div>
+          </div>
+
+          <div class="simulator-body">
+            <!-- Attention Curve Visualizer -->
+            <div class="topology-graph">
+              <svg class="topology-curve-svg" viewBox="0 0 900 140" preserveAspectRatio="none">
+                <defs>
+                  <!-- Cyan / Blue gradient for edgenote -->
+                  <linearGradient id="gradientEdgenote" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#38bdf8" />
+                    <stop offset="35%" stop-color="#1e293b" />
+                    <stop offset="50%" stop-color="#0f172a" />
+                    <stop offset="65%" stop-color="#1e293b" />
+                    <stop offset="100%" stop-color="#38bdf8" />
+                  </linearGradient>
+
+                  <!-- Red / Orange gradient for linear failure -->
+                  <linearGradient id="gradientLinear" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#38bdf8" />
+                    <stop offset="30%" stop-color="#ef4444" />
+                    <stop offset="50%" stop-color="#dc2626" />
+                    <stop offset="70%" stop-color="#ef4444" />
+                    <stop offset="100%" stop-color="#38bdf8" />
+                  </linearGradient>
+                </defs>
+
+                <!-- Base Grid Guide -->
+                <path class="curve-path-base" d="M 0 120 L 900 120" />
+
+                <!-- The U-Shaped Attention Curve -->
+                <path id="attentionCurvePath" class="curve-path-attention"
+                  d="M 20 25 C 180 30, 260 115, 450 115 C 640 115, 720 30, 880 25"
+                  stroke="url(#gradientEdgenote)" />
+              </svg>
+
+              <!-- Radar Scan Motion Line -->
+              <div class="curve-pulse-beam"></div>
+
+              <div class="dead-zone-label">
+                <span id="deadZoneBadge" class="dead-zone-indicator badge-success">
+                  DEFENSIVE CENTER: LOW-RISK EVIDENCE ONLY
+                </span>
+              </div>
+            </div>
+
+            <!-- Dynamic Prompt Slots Container -->
+            <div class="slots-container" id="promptSlots">
+              <!-- Injected by JavaScript -->
+            </div>
+
+            <!-- Diagnostic Status Bar -->
+            <div class="diagnostic-bar" id="diagnosticResult">
+              <!-- Injected by JavaScript -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- The Problem Context Section -->
+    <section class="section reveal" id="problem">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Attention Dynamics</span>
+          <h2 class="section-title">Why Middle Context Fails Silently</h2>
+          <p class="section-desc">
+            Decoder-only Transformers exhibit a pronounced U-shaped attention distribution (Liu et al., 2023). While information at the beginning (primacy) and end (recency) is recalled reliably, critical rules in the middle suffer severe degradation.
+          </p>
+        </div>
+
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <h3>The 1M Token Illusion</h3>
+            <p>
+              Context window size measures capacity, not comprehension. Having 128k or 1M tokens does not guarantee equal attention across the sequence.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </div>
+            <h3>Silent Hallucinations</h3>
+            <p>
+              When constraints like budget caps or negative rules sit in the middle 50% of a prompt, models act as though the rules were never provided.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="9" y1="3" x2="9" y2="21"></line>
+              </svg>
+            </div>
+            <h3>Geometric Solution</h3>
+            <p>
+              Instead of naive linear concatenation, prompt geometry must be restructured around the transformer’s native attention topology.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Core Capabilities Section -->
+    <section class="section reveal" id="capabilities">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Core Mechanisms</span>
+          <h2 class="section-title">How edgenote Restores Recall</h2>
+          <p class="section-desc">
+            A specialized Python package delivering three deterministic prompt-engineering mechanisms.
+          </p>
+        </div>
+
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <polyline points="19 12 12 19 5 12"></polyline>
+              </svg>
+            </div>
+            <h3>1. Edge Pinning</h3>
+            <p>
+              Anchors high-priority instructions, budget caps, and formatting constraints to the head preamble and echoes them at the tail edge right before generation.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              </svg>
+            </div>
+            <h3>2. U-Shaped Interleaving</h3>
+            <p>
+              Sorts search documents so Rank 1 goes to the head, Rank 2 goes to the tail, and lower-ranked context occupies the low-attention center valley.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+              </svg>
+            </div>
+            <h3>3. Centripetal Eviction</h3>
+            <p>
+              Measures real token lengths across native tokenizers (tiktoken, Hugging Face) and evicts low-priority context from the center outward when limits are exceeded.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Benchmark Matrix Section -->
+    <section class="section reveal" id="benchmark">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Empirical Benchmark</span>
+          <h2 class="section-title">Needle in a Haystack Verification</h2>
+          <p class="section-desc">
+            Retrieval evaluation across deep context positions comparing a standard baseline prompt against edgenote.
+          </p>
+        </div>
+
+        <div class="benchmark-card">
+          <table class="benchmark-table">
+            <thead>
+              <tr>
+                <th>Context Position</th>
+                <th>Baseline Prompt</th>
+                <th>edgenote (Edge Pinning)</th>
+                <th>Token Overhead</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>0.0 (Start / Primacy)</strong></td>
+                <td><span class="status-passed">✓ PASSED</span></td>
+                <td><span class="status-passed">✓ PASSED</span></td>
+                <td><span class="overhead-pill">+44 tokens</span></td>
+              </tr>
+              <tr>
+                <td><strong>0.25 (Quarter Depth)</strong></td>
+                <td><span class="status-failed">✗ FAILED (0% recall)</span></td>
+                <td><span class="status-passed">✓ PASSED (100%)</span></td>
+                <td><span class="overhead-pill">+44 tokens</span></td>
+              </tr>
+              <tr>
+                <td><strong>0.50 (Dead Center)</strong></td>
+                <td><span class="status-failed">✗ FAILED (0% recall)</span></td>
+                <td><span class="status-passed">✓ PASSED (100%)</span></td>
+                <td><span class="overhead-pill">+44 tokens</span></td>
+              </tr>
+              <tr>
+                <td><strong>0.75 (Three-Quarters)</strong></td>
+                <td><span class="status-failed">✗ FAILED (0% recall)</span></td>
+                <td><span class="status-passed">✓ PASSED (100%)</span></td>
+                <td><span class="overhead-pill">+44 tokens</span></td>
+              </tr>
+              <tr>
+                <td><strong>1.0 (End / Recency)</strong></td>
+                <td><span class="status-passed">✓ PASSED</span></td>
+                <td><span class="status-passed">✓ PASSED</span></td>
+                <td><span class="overhead-pill">+44 tokens</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quickstart Section -->
+    <section class="section reveal" id="quickstart">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Implementation</span>
+          <h2 class="section-title">Minimal Developer Ergonomics</h2>
+          <p class="section-desc">
+            Construct prompts defensively in four lines of Python without complicated pipeline dependencies.
+          </p>
+        </div>
+
+        <div class="code-box">
+          <div class="code-header">
+            <div class="code-dots">
+              <span></span><span></span><span></span>
+            </div>
+            <span class="code-title">example.py</span>
+            <span></span>
+          </div>
+
+          <pre class="code-content"><code><span class="token-kw">from</span> edgenote <span class="token-kw">import</span> Session
+
+<span class="token-cmt"># 1. Initialize session</span>
+s = Session()
+
+<span class="token-cmt"># 2. Pin unbreakable constraints to both head & tail boundaries</span>
+s.pin(<span class="token-str">"Budget is strictly capped at $185,000."</span>, label=<span class="token-str">"Financial Constraint"</span>)
+
+<span class="token-cmt"># 3. Add context chunks with relevance scores</span>
+s.add(<span class="token-str">"Vendor A quotation: $240,000"</span>, relevance=<span class="token-num">0.60</span>)
+s.add(<span class="token-str">"Vendor B quotation: $180,000"</span>, relevance=<span class="token-num">0.95</span>)
+
+<span class="token-cmt"># 4. Render prompt with optimized U-shaped geometry</span>
+result = s.render(<span class="token-str">"Which vendor quotation qualifies under our budget?"</span>)
+
+<span class="token-fn">print</span>(result.text)
+<span class="token-fn">print</span>(f<span class="token-str">"Tokens: {result.tokens} | Pin overhead: +{result.pin_overhead}"</span>)
+
+<span class="token-cmt"># Ready-to-send messages for OpenAI, Anthropic, Groq, or Ollama</span>
+messages = result.to_messages()</code></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div style="display: flex; align-items: center; gap: 0.85rem;">
+        <img src="favicon.png" alt="edgenote icon" style="width: 24px; height: 24px; border-radius: 4px; object-fit: contain;">
+        <p>edgenote — Developed by <a href="https://tareqshahalam.is-a.dev/" target="_blank" rel="noopener noreferrer" style="color: var(--text-primary); text-decoration: none; font-weight: 500;">Md Tareq Shah Alam</a></p>
+      </div>
+
+      <ul class="footer-links">
+        <li><a href="https://pypi.org/project/edgenote/" target="_blank" rel="noopener noreferrer">PyPI</a></li>
+        <li><a href="https://www.linkedin.com/in/md-tareq-shah-alam/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+        <li><a href="https://github.com/tareqshahalam" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+</body>
+</html>
