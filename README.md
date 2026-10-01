@@ -86,3 +86,40 @@ from edgenote import EdgeNote
 # and organize important information
 # before sending it to an LLM.
 ```
+```md
+## Key Features
+
+- Lightweight Python package
+- Provider-agnostic design
+- No LLM API calls required
+- Token-aware context management
+- Long-context optimization
+- RAG-compatible context processing
+- Configurable context organization
+- Standard LLM message compatibility
+
+## Use Cases
+
+- Long-context LLM applications
+- RAG systems
+- Document question answering
+- Agentic AI workflows
+- Large prompt processing
+- Multi-document reasoning
+- Context-heavy AI applications
+
+## Research Background
+
+edgenote is based on research around the **Lost in the Middle** phenomenon in long-context language models.
+
+Related research:
+
+Liu et al., *Lost in the Middle: How Language Models Use Long Contexts*
+
+https://arxiv.org/abs/2307.03172
+
+## Links
+
+- Website: https://pyedgenote.github.io/
+- PyPI: https://pypi.org/project/edgenote/
+```
