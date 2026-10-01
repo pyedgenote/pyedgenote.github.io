@@ -34,3 +34,45 @@ It provides mechanisms such as:
 
 ```bash
 pip install edgenote
+
+```
+## Supported LLM Providers
+
+edgenote is provider-agnostic and can be used with:
+
+- OpenAI
+- Anthropic
+- Groq
+- Ollama
+- OpenAI-compatible APIs
+
+edgenote does not make LLM API calls itself. It focuses on organizing and optimizing context before the prompt is sent to the model.
+
+## Benchmark
+
+In our benchmark, edgenote was evaluated using a 4,000-token context with GPT-4o-mini.
+
+The benchmark tests whether information placed at different positions within a long context can be successfully retrieved.
+
+See the full benchmark methodology and results:
+
+https://pyedgenote.github.io/
+
+## Documentation
+
+- Website: https://pyedgenote.github.io/
+- PyPI: https://pypi.org/project/edgenote/
+
+## Related Concepts
+
+- Lost in the Middle
+- LLM context management
+- Long-context LLMs
+- RAG context ordering
+- Prompt optimization
+- Context window management
+- Token-aware prompt construction
+
+## License
+
+MIT License
