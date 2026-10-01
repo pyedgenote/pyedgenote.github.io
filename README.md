@@ -76,3 +76,13 @@ https://pyedgenote.github.io/
 ## License
 
 MIT License
+
+## Quick Example
+
+```python
+from edgenote import EdgeNote
+
+# Add your long-context content
+# and organize important information
+# before sending it to an LLM.
+```
