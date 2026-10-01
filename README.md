@@ -1,5 +1,5 @@
-# edgenote.github.io
+# pyedgenote.github.io
 
-Official documentation and website for **edgenote** — A Python package to mitigate attention degradation in long LLM prompts by anchoring critical constraints at prompt boundaries.
+Official documentation and website for **edgenote** — an open-source Python package for mitigating the Lost in the Middle problem in large language model (LLM) context.
 
-Website: [https://edgenote-py.github.io/edgenote.github.io/](https://edgenote-py.github.io/edgenote.github.io/)
+Website: [https://pyedgenote.github.io/](https://pyedgenote.github.io/)
