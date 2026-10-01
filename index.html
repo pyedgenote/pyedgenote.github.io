@@ -1,20 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Primary SEO -->
   <title>edgenote</title>
-  <meta name="description" content="A lightweight Python package designed to mitigate the Lost in the Middle attention degradation problem in Large Language Models.">
-  <meta name="keywords" content="edgenote, python, llm, lost-in-the-middle, prompt-engineering, rag, context-window, transformers">
+  <meta name="description"
+    content="edgenote is a Python package that fixes the Lost in the Middle attention problem in LLMs. Anchor critical constraints at prompt boundaries using edge pinning, U-shaped interleaving, and centripetal eviction. Works with OpenAI, Anthropic, Groq & Ollama.">
+  <meta name="keywords"
+    content="edgenote, lost in the middle, LLM prompt optimization, RAG context window, edge pinning, Python package, prompt engineering, transformer attention, tiktoken, hugging face, OpenAI, Anthropic, context length, token counting, BM25 reranking">
   <meta name="author" content="Md Tareq Shah Alam">
+  <meta name="robots" content="index, follow">
 
-  <!-- Canonical & Open Graph -->
-  <link rel="canonical" href="https://edgenote.github.io">
-  <meta property="og:title" content="edgenote — Edge-Pinning Python Package for LLMs">
-  <meta property="og:description" content="Mitigates the Lost in the Middle attention problem by anchoring critical constraints and context at prompt boundaries.">
-  <meta property="og:url" content="https://edgenote.github.io">
+  <!-- Canonical -->
+  <link rel="canonical" href="https://edgenote-py.github.io/">
+
+  <!-- Open Graph -->
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://edgenote-py.github.io/">
+  <meta property="og:title" content="edgenote — Fix Lost in the Middle in LLM Prompts">
+  <meta property="og:description"
+    content="A Python package that mitigates attention degradation in long LLM prompts. Pin critical constraints to prompt edges. 100% recall at every context depth.">
+  <meta property="og:site_name" content="edgenote">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="edgenote — Fix Lost in the Middle in LLM Prompts">
+  <meta name="twitter:description"
+    content="A Python package that mitigates attention degradation in long LLM prompts. Pin critical constraints to prompt edges.">
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "edgenote",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Python 3.10+",
+    "description": "A Python package that fixes the Lost in the Middle attention problem in Large Language Models by anchoring critical constraints at prompt boundaries.",
+    "url": "https://edgenote-py.github.io/",
+    "downloadUrl": "https://pypi.org/project/edgenote/",
+    "softwareVersion": "0.1.3",
+    "author": {
+      "@type": "Person",
+      "name": "Md Tareq Shah Alam",
+      "url": "https://tareqshahalam.is-a.dev/"
+    },
+    "license": "https://pypi.org/project/edgenote/",
+    "keywords": "LLM, prompt engineering, lost in the middle, RAG, context window, Python"
+  }
+  </script>
 
   <!-- Favicons -->
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -22,10 +59,12 @@
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="shortcut icon" href="favicon.png">
 
-  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
 
   <!-- Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
@@ -33,371 +72,995 @@
 
 <body>
 
-  <!-- Background Decorative Grid & Glow -->
-  <div class="background-grid"></div>
-  <div class="background-glow"></div>
+  <!-- Background -->
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow" aria-hidden="true"></div>
 
-  <!-- Navigation -->
-  <header class="navbar">
-    <div class="container nav-container">
+  <!-- ===== NAVIGATION ===== -->
+  <header class="navbar" role="banner">
+    <div class="container nav-inner">
       <a href="#" class="brand" aria-label="edgenote home">
-        <img src="logo.png" alt="edgenote logo" class="brand-logo">
+        <img src="logo.png" alt="edgenote" class="brand-logo">
       </a>
 
-      <ul class="nav-links">
-        <li><a href="#simulator">Simulator</a></li>
-        <li><a href="#problem">The Problem</a></li>
-        <li><a href="#capabilities">Capabilities</a></li>
-        <li><a href="#benchmark">Benchmark</a></li>
-        <li><a href="#quickstart">Quickstart</a></li>
-      </ul>
+      <nav aria-label="Primary navigation">
+        <ul class="nav-links">
+          <li><a href="#problem">Problem</a></li>
+          <li><a href="#solution">How It Works</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#benchmark">Benchmark</a></li>
+          <li><a href="#quickstart">Quickstart</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </nav>
 
-      <div class="nav-actions">
-        <a href="https://pypi.org/project/edgenote/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 0L1.75 5.92v12.16L12 24l10.25-5.92V5.92L12 0zm-.75 2.14l7.63 4.41-3.32 1.92-7.63-4.41 3.32-1.92zm-8.25 5.4l7.5 4.34v8.13l-7.5-4.34V7.54zm16.5 8.13l-7.5 4.34v-8.13l7.5-4.34v8.13z" />
-          </svg>
-          <span>PyPI</span>
-        </a>
-      </div>
+      <!-- <div class="nav-cta">
+        <a href="https://github.com/tareqshahalam" target="_blank" rel="noopener noreferrer" class="btn-ghost" aria-label="GitHub">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+        </a> -->
+      <a href="https://pypi.org/project/edgenote/" target="_blank" rel="noopener noreferrer" class="btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path
+            d="M12 0L1.75 5.92v12.16L12 24l10.25-5.92V5.92L12 0zm-.75 2.14l7.63 4.41-3.32 1.92-7.63-4.41 3.32-1.92zm-8.25 5.4l7.5 4.34v8.13l-7.5-4.34V7.54zm16.5 8.13l-7.5 4.34v-8.13l7.5-4.34v8.13z" />
+        </svg>
+        PyPI
+      </a>
+    </div>
     </div>
   </header>
 
-  <!-- Hero Section -->
-  <main>
-    <section class="hero" id="overview">
+  <main id="main-content">
+
+    <!-- ===== HERO ===== -->
+    <section class="hero" id="overview" aria-labelledby="hero-heading">
       <div class="container">
 
-        <div class="hero-pill">
-          <span class="dot"></span>
-          <span>Python Package for LLM Prompt Geometry</span>
+        <div class="hero-badge">
+          <span class="badge-dot" aria-hidden="true"></span>
+          <span>Python 3.10+ &nbsp;·&nbsp; v0.1.3 &nbsp;·&nbsp; pip install edgenote</span>
         </div>
 
-        <h1>
-          Fight the <span class="gradient-text">Lost in the Middle</span> problem in LLMs.
+        <h1 id="hero-heading">
+          Stop Losing Critical Context<br>
+          <span class="gradient-text">in the Middle of Your Prompts.</span>
         </h1>
 
-        <p class="hero-subtitle">
-          A dedicated Python package that mitigates attention degradation in long prompts by anchoring critical constraints and high-scoring context at context window boundaries.
+        <p class="hero-sub">
+          <strong>edgenote</strong> is a Python library that solves the <em>Lost in the Middle</em> problem in LLMs,
+          where models silently ignore instructions buried in long contexts. It achieves <strong>100% recall</strong> at
+          every context depth with only a +44 token overhead.
         </p>
 
-        <!-- Command Bar -->
-        <div class="install-bar">
-          <span class="install-text">
-            <span class="prefix">$ </span>
-            <span id="installCommandText">pip install edgenote</span>
-          </span>
-          <button id="copyInstallBtn" class="copy-btn" aria-label="Copy install command">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-            <span>Copy</span>
-          </button>
+        <div class="hero-actions">
+          <div class="install-bar" id="installBar">
+            <span class="install-prefix" aria-hidden="true">$</span>
+            <code id="installCommandText">pip install edgenote</code>
+            <button id="copyInstallBtn" class="copy-btn" aria-label="Copy pip install edgenote">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                aria-hidden="true">
+                <rect x="9" y="9" width="13" height="13" rx="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+              <span>Copy</span>
+            </button>
+          </div>
+          <!-- <a href="https://pypi.org/project/edgenote/" target="_blank" rel="noopener noreferrer" class="btn-outline">
+            View on PyPI →
+          </a> -->
         </div>
 
-        <!-- Interactive Simulator Card -->
-        <div class="simulator-container" id="simulator">
-          <div class="simulator-header">
-            <div class="simulator-title">
-              <span class="simulator-status-dot"></span>
-              <span>Attention Topology Diagnostic</span>
-            </div>
-
-            <!-- Mode Switcher -->
-            <div class="mode-toggle">
-              <button id="modeLinear" class="mode-btn">Linear Context (Vulnerable)</button>
-              <button id="modeEdgenote" class="mode-btn active">edgenote (Edge-Pinned)</button>
-            </div>
+        <div class="hero-stats" role="list" aria-label="Package statistics">
+          <div class="stat" role="listitem">
+            <span class="stat-value">100%</span>
+            <span class="stat-label">Recall at all depths</span>
           </div>
-
-          <div class="simulator-body">
-            <!-- Attention Curve Visualizer -->
-            <div class="topology-graph">
-              <svg class="topology-curve-svg" viewBox="0 0 900 140" preserveAspectRatio="none">
-                <defs>
-                  <!-- Cyan / Blue gradient for edgenote -->
-                  <linearGradient id="gradientEdgenote" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#38bdf8" />
-                    <stop offset="35%" stop-color="#1e293b" />
-                    <stop offset="50%" stop-color="#0f172a" />
-                    <stop offset="65%" stop-color="#1e293b" />
-                    <stop offset="100%" stop-color="#38bdf8" />
-                  </linearGradient>
-
-                  <!-- Red / Orange gradient for linear failure -->
-                  <linearGradient id="gradientLinear" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#38bdf8" />
-                    <stop offset="30%" stop-color="#ef4444" />
-                    <stop offset="50%" stop-color="#dc2626" />
-                    <stop offset="70%" stop-color="#ef4444" />
-                    <stop offset="100%" stop-color="#38bdf8" />
-                  </linearGradient>
-                </defs>
-
-                <!-- Base Grid Guide -->
-                <path class="curve-path-base" d="M 0 120 L 900 120" />
-
-                <!-- The U-Shaped Attention Curve -->
-                <path id="attentionCurvePath" class="curve-path-attention"
-                  d="M 20 25 C 180 30, 260 115, 450 115 C 640 115, 720 30, 880 25"
-                  stroke="url(#gradientEdgenote)" />
-              </svg>
-
-              <!-- Radar Scan Motion Line -->
-              <div class="curve-pulse-beam"></div>
-
-              <div class="dead-zone-label">
-                <span id="deadZoneBadge" class="dead-zone-indicator badge-success">
-                  DEFENSIVE CENTER: LOW-RISK EVIDENCE ONLY
-                </span>
-              </div>
-            </div>
-
-            <!-- Dynamic Prompt Slots Container -->
-            <div class="slots-container" id="promptSlots">
-              <!-- Injected by JavaScript -->
-            </div>
-
-            <!-- Diagnostic Status Bar -->
-            <div class="diagnostic-bar" id="diagnosticResult">
-              <!-- Injected by JavaScript -->
-            </div>
+          <div class="stat-divider" aria-hidden="true"></div>
+          <div class="stat" role="listitem">
+            <span class="stat-value">+44 tokens</span>
+            <span class="stat-label">Minimal overhead</span>
+          </div>
+          <div class="stat-divider" aria-hidden="true"></div>
+          <div class="stat" role="listitem">
+            <span class="stat-value">4</span>
+            <span class="stat-label">LLM providers supported</span>
+          </div>
+          <div class="stat-divider" aria-hidden="true"></div>
+          <div class="stat" role="listitem">
+            <span class="stat-value">0</span>
+            <span class="stat-label">Pipeline lock-in</span>
           </div>
         </div>
 
       </div>
     </section>
 
-    <!-- The Problem Context Section -->
-    <section class="section reveal" id="problem">
+    <!-- ===== PROBLEM ===== -->
+    <section class="section section-alt reveal" id="problem" aria-labelledby="problem-heading">
       <div class="container">
-        <div class="section-header">
-          <span class="section-tag">Attention Dynamics</span>
-          <h2 class="section-title">Why Middle Context Fails Silently</h2>
-          <p class="section-desc">
-            Decoder-only Transformers exhibit a pronounced U-shaped attention distribution (Liu et al., 2023). While information at the beginning (primacy) and end (recency) is recalled reliably, critical rules in the middle suffer severe degradation.
-          </p>
-        </div>
+        <div class="section-label">The Problem</div>
+        <h2 id="problem-heading" class="section-title">Your LLM Is Ignoring Instructions You Gave It.</h2>
+        <p class="section-sub">
+          Decoder-only Transformers exhibit a U-shaped attention distribution (Liu et al., 2023). Information at the
+          beginning (primacy bias) and the end (recency bias) is recalled reliably — but anything placed in the middle
+          40–60% of the context window is dramatically degraded or completely lost.
+        </p>
 
-        <div class="grid-3">
-          <div class="card">
-            <div class="card-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        <div class="problem-grid">
+          <article class="problem-card">
+            <div class="problem-icon problem-icon--red" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
               </svg>
             </div>
             <h3>The 1M Token Illusion</h3>
-            <p>
-              Context window size measures capacity, not comprehension. Having 128k or 1M tokens does not guarantee equal attention across the sequence.
-            </p>
-          </div>
+            <p>Context window <em>capacity</em> is not context window <em>comprehension</em>. A 128k or 1M token window
+              does not guarantee that the model attends equally across all positions. Most attention is consumed by the
+              first and last few hundred tokens.</p>
+          </article>
 
-          <div class="card">
-            <div class="card-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          <article class="problem-card">
+            <div class="problem-icon problem-icon--red" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
               </svg>
             </div>
-            <h3>Silent Hallucinations</h3>
-            <p>
-              When constraints like budget caps or negative rules sit in the middle 50% of a prompt, models act as though the rules were never provided.
-            </p>
-          </div>
+            <h3>Silent Constraint Violations</h3>
+            <p>When a critical rule — like a budget cap, a negative constraint, or a required format — sits in the
+              middle 50% of your prompt, the model acts as though the rule was never given. There is no error, just a
+              wrong answer.</p>
+          </article>
 
-          <div class="card">
-            <div class="card-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="9" y1="3" x2="9" y2="21"></line>
+          <article class="problem-card">
+            <div class="problem-icon problem-icon--amber" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
               </svg>
             </div>
-            <h3>Geometric Solution</h3>
-            <p>
-              Instead of naive linear concatenation, prompt geometry must be restructured around the transformer’s native attention topology.
-            </p>
+            <h3>RAG Recall Degradation</h3>
+            <p>In Retrieval-Augmented Generation pipelines, the most relevant retrieved document is often buried in the
+              middle of a long context. Standard linear concatenation of chunks guarantees that your best evidence sits
+              in the lowest-attention zone.</p>
+          </article>
+        </div>
+
+        <!-- Attention curve visual -->
+        <div class="attention-visual" aria-label="U-shaped attention curve diagram">
+          <div class="attn-curve-wrap">
+            <svg viewBox="0 0 800 120" preserveAspectRatio="none" class="attn-curve-svg" aria-hidden="true">
+              <defs>
+                <linearGradient id="attnGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#38bdf8" stop-opacity="1" />
+                  <stop offset="30%" stop-color="#ef4444" stop-opacity="0.8" />
+                  <stop offset="50%" stop-color="#dc2626" stop-opacity="1" />
+                  <stop offset="70%" stop-color="#ef4444" stop-opacity="0.8" />
+                  <stop offset="100%" stop-color="#38bdf8" stop-opacity="1" />
+                </linearGradient>
+              </defs>
+              <path d="M 10 15 C 120 18, 210 100, 400 105 C 590 100, 680 18, 790 15" fill="none" stroke="url(#attnGrad)"
+                stroke-width="3.5" stroke-linecap="round" />
+            </svg>
+            <div class="attn-labels" aria-hidden="true">
+              <span class="attn-label attn-label--good">High Attention<br>(Primacy)</span>
+              <span class="attn-label attn-label--bad">⚠ Dead Zone<br>0–12% Recall</span>
+              <span class="attn-label attn-label--good">High Attention<br>(Recency)</span>
+            </div>
           </div>
+          <p class="attn-caption">U-shaped attention distribution in Decoder-only Transformers (Liu et al., 2023). The
+            center of any long prompt is a graveyard for critical information.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== HOW IT WORKS / SOLUTION ===== -->
+    <section class="section reveal" id="solution" aria-labelledby="solution-heading">
+      <div class="container">
+        <div class="section-label">The Solution</div>
+        <h2 id="solution-heading" class="section-title">edgenote Restructures Your Prompt Around Attention Topology.
+        </h2>
+        <p class="section-sub">
+          Instead of naive linear concatenation, edgenote applies three deterministic, geometry-aware mechanisms to
+          ensure the right tokens always land in high-attention zones.
+        </p>
+
+        <div class="mechanism-list">
+
+          <div class="mechanism reveal">
+            <div class="mechanism-num" aria-hidden="true">01</div>
+            <div class="mechanism-content">
+              <h3>Edge Pinning</h3>
+              <p>Anchors your highest-priority instructions — budget caps, negative rules, hard constraints, output
+                format requirements — at both the <strong>head</strong> (position 0.0) and <strong>tail</strong>
+                (position 1.0) of the prompt. The tail echo fires immediately before the generation token, leveraging
+                maximum recency bias. This guarantees the model sees your constraints at both the primacy and recency
+                peaks of the U-curve.</p>
+              <div class="mechanism-tag">
+                <span class="tag">100% Constraint Recall</span>
+                <span class="tag">+0 extra reasoning steps</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mechanism reveal">
+            <div class="mechanism-num" aria-hidden="true">02</div>
+            <div class="mechanism-content">
+              <h3>U-Shaped Interleaving</h3>
+              <p>Sorts your RAG retrieval documents so the <strong>most relevant chunk (Rank 1)</strong> is placed near
+                the head and the <strong>second-most relevant (Rank 2)</strong> is placed near the tail — while
+                low-relevance filler content safely occupies the dead-zone center valley. This maps directly onto the
+                U-curve's high-attention zones, maximising evidence recall without changing the total token budget.</p>
+              <div class="mechanism-tag">
+                <span class="tag">Works with any reranker</span>
+                <span class="tag">BM25 + CrossEncoder ready</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mechanism reveal">
+            <div class="mechanism-num" aria-hidden="true">03</div>
+            <div class="mechanism-content">
+              <h3>Centripetal Eviction</h3>
+              <p>Measures real token lengths using native tokenizers — <strong>tiktoken</strong> for OpenAI models and
+                <strong>Hugging Face tokenizers</strong> for open-weights models — and automatically evicts the
+                lowest-priority context chunks from the center outward when a token limit is exceeded. No content is
+                ever evicted from the edges; only the lowest-attention valley is trimmed.
+              </p>
+              <div class="mechanism-tag">
+                <span class="tag">tiktoken</span>
+                <span class="tag">Hugging Face Tokenizers</span>
+                <span class="tag">Exact token budgeting</span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
 
-    <!-- Core Capabilities Section -->
-    <section class="section reveal" id="capabilities">
+    <!-- ===== PROMPT ANATOMY COMPARISON ===== -->
+    <section class="section section-alt reveal" id="how-it-works" aria-labelledby="anatomy-heading">
       <div class="container">
-        <div class="section-header">
-          <span class="section-tag">Core Mechanisms</span>
-          <h2 class="section-title">How edgenote Restores Recall</h2>
-          <p class="section-desc">
-            A specialized Python package delivering three deterministic prompt-engineering mechanisms.
-          </p>
+        <div class="section-label">Before &amp; After</div>
+        <h2 id="anatomy-heading" class="section-title">The Same Prompt. Two Very Different Outcomes.</h2>
+        <p class="section-sub">Both prompts contain identical information. Only the <em>geometry</em> is different.
+          edgenote ensures critical content always occupies the highest-attention positions.</p>
+
+        <div class="anatomy-compare">
+
+          <!-- BEFORE -->
+          <div class="anatomy-panel anatomy-panel--bad">
+            <div class="anatomy-panel-header">
+              <div class="anatomy-panel-status">
+                <span class="anatomy-status-dot anatomy-status-dot--bad"></span>
+                <span class="anatomy-panel-label">Without edgenote</span>
+              </div>
+              <span class="anatomy-result-tag anatomy-result-tag--bad">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                  aria-hidden="true">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+                0% Constraint Recall
+              </span>
+            </div>
+
+            <div class="anatomy-slots">
+              <div class="anatomy-slot anatomy-slot--neutral">
+                <div class="anatomy-slot-pos">
+                  <span class="anatomy-pos-label">0.0</span>
+                  <span class="anatomy-attention anatomy-attention--high">↑ High attention</span>
+                </div>
+                <div class="anatomy-slot-body">
+                  <div class="anatomy-slot-icon anatomy-slot-icon--neutral" aria-hidden="true">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                  </div>
+                  <span>General company overview</span>
+                </div>
+              </div>
+
+              <div class="anatomy-slot anatomy-slot--neutral anatomy-slot--fade">
+                <div class="anatomy-slot-pos">
+                  <span class="anatomy-pos-label">0.25</span>
+                  <span class="anatomy-attention anatomy-attention--mid">↓ Fading</span>
+                </div>
+                <div class="anatomy-slot-body">
+                  <div class="anatomy-slot-icon anatomy-slot-icon--neutral" aria-hidden="true">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    </svg>
+                  </div>
+                  <span>Server room temperature limits</span>
+                </div>
+              </div>
+
+              <div class="anatomy-slot anatomy-slot--critical">
+                <div class="anatomy-slot-pos">
+                  <span class="anatomy-pos-label">0.50</span>
+                  <span class="anatomy-attention anatomy-attention--dead">✗ Dead zone</span>
+                </div>
+                <div class="anatomy-slot-body">
+                  <div class="anatomy-slot-icon anatomy-slot-icon--critical" aria-hidden="true">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                  </div>
+                  <strong>Budget cap: $185,000</strong>
+                </div>
+                <div class="anatomy-slot-lost" aria-label="This content is lost">LOST — 0% Recall</div>
+              </div>
+
+              <div class="anatomy-slot anatomy-slot--neutral anatomy-slot--fade">
+                <div class="anatomy-slot-pos">
+                  <span class="anatomy-pos-label">0.75</span>
+                  <span class="anatomy-attention anatomy-attention--mid">↓ Fading</span>
+                </div>
+                <div class="anatomy-slot-body">
+                  <div class="anatomy-slot-icon anatomy-slot-icon--neutral" aria-hidden="true">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    </svg>
+                  </div>
+                  <span>Vendor A quotation: $240,000</span>
+                </div>
+              </div>
+
+              <div class="anatomy-slot anatomy-slot--neutral">
+                <div class="anatomy-slot-pos">
+                  <span class="anatomy-pos-label">1.0</span>
+                  <span class="anatomy-attention anatomy-attention--high">↑ High attention</span>
+                </div>
+                <div class="anatomy-slot-body">
+                  <div class="anatomy-slot-icon anatomy-slot-icon--neutral" aria-hidden="true">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                      <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                  </div>
+                  <span>Query: Which vendor fits our budget?</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="anatomy-outcome anatomy-outcome--bad">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                aria-hidden="true">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="15" y1="9" x2="9" y2="15" />
+                <line x1="9" y1="9" x2="15" y2="15" />
+              </svg>
+              Model ignores budget cap → recommends Vendor A at $240k
+            </div>
+          </div>
+
+          <!-- DIVIDER ARROW -->
+          <div class="anatomy-arrow" aria-hidden="true">
+            <div class="anatomy-arrow-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </div>
+            <span class="anatomy-arrow-label">edgenote</span>
+          </div>
+
+          <!-- AFTER -->
+          <div class="anatomy-panel anatomy-panel--good">
+            <div class="anatomy-panel-header">
+              <div class="anatomy-panel-status">
+                <span class="anatomy-status-dot anatomy-status-dot--good"></span>
+                <span class="anatomy-panel-label">With edgenote</span>
+              </div>
+              <span class="anatomy-result-tag anatomy-result-tag--good">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                  aria-hidden="true">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                100% Constraint Recall
+              </span>
+            </div>
+
+            <div class="anatomy-slots">
+              <div class="anatomy-slot anatomy-slot--pinned">
+                <div class="anatomy-slot-pos">
+                  <span class="anatomy-pos-label">0.0 · Head Pin</span>
+                  <span class="anatomy-attention anatomy-attention--pinned">⬆ Pinned</span>
+                </div>
+                <div class="anatomy-slot-body">
+                  <div class="anatomy-slot-icon anatomy-slot-icon--pinned" aria-hidden="true">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                  </div>
+                  <strong>Budget cap: $185,000</strong>
+                </div>
+                <div class="anatomy-slot-fortified">100% Fortified</div>
+              </div>
+
+              <div class="anatomy-slot anatomy-slot--near">
+                <div class="anatomy-slot-pos">
+                  <span class="anatomy-pos-label">0.25 · Near-Head</span>
+                  <span class="anatomy-attention anatomy-attention--high">↑ 95% attention</span>
+                </div>
+                <div class="anatomy-slot-body">
+                  <div class="anatomy-slot-icon anatomy-slot-icon--near" aria-hidden="true">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polygon
+                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  </div>
+                  <span>Rank 1: Vendor B quotation $180k</span>
+                </div>
+              </div>
+
+              <div class="anatomy-slot anatomy-slot--valley">
+                <div class="anatomy-slot-pos">
+                  <span class="anatomy-pos-label">0.50 · Valley</span>
+                  <span class="anatomy-attention anatomy-attention--valley">⬇ Sacrificial</span>
+                </div>
+                <div class="anatomy-slot-body">
+                  <div class="anatomy-slot-icon anatomy-slot-icon--valley" aria-hidden="true">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    </svg>
+                  </div>
+                  <span>Low-priority filler / context</span>
+                </div>
+              </div>
+
+              <div class="anatomy-slot anatomy-slot--near">
+                <div class="anatomy-slot-pos">
+                  <span class="anatomy-pos-label">0.75 · Near-Tail</span>
+                  <span class="anatomy-attention anatomy-attention--high">↑ 96% attention</span>
+                </div>
+                <div class="anatomy-slot-body">
+                  <div class="anatomy-slot-icon anatomy-slot-icon--near" aria-hidden="true">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polygon
+                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  </div>
+                  <span>Rank 2: Vendor A quotation $240k</span>
+                </div>
+              </div>
+
+              <div class="anatomy-slot anatomy-slot--pinned">
+                <div class="anatomy-slot-pos">
+                  <span class="anatomy-pos-label">1.0 · Tail Echo</span>
+                  <span class="anatomy-attention anatomy-attention--pinned">⬆ Pinned</span>
+                </div>
+                <div class="anatomy-slot-body">
+                  <div class="anatomy-slot-icon anatomy-slot-icon--pinned" aria-hidden="true">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                  </div>
+                  <strong>Constraint echo + Query</strong>
+                </div>
+                <div class="anatomy-slot-fortified">100% Fortified</div>
+              </div>
+            </div>
+
+            <div class="anatomy-outcome anatomy-outcome--good">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                aria-hidden="true">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+              Model honours budget cap → correctly selects Vendor B at $180k
+            </div>
+          </div>
+
         </div>
 
-        <div class="grid-3">
-          <div class="card">
-            <div class="card-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <polyline points="19 12 12 19 5 12"></polyline>
-              </svg>
-            </div>
-            <h3>1. Edge Pinning</h3>
-            <p>
-              Anchors high-priority instructions, budget caps, and formatting constraints to the head preamble and echoes them at the tail edge right before generation.
-            </p>
+        <!-- Overhead callout -->
+        <div class="anatomy-callout">
+          <div class="anatomy-callout-stat">
+            <span class="anatomy-callout-num">+44</span>
+            <span class="anatomy-callout-unit">tokens</span>
           </div>
+          <div class="anatomy-callout-divider" aria-hidden="true"></div>
+          <p class="anatomy-callout-text">That is the <em>total</em> token overhead of edgenote's edge pinning — the
+            head pin + tail echo combined. It does not scale with context length. A 100k token prompt pays the same +44
+            token cost as a 1k token prompt.</p>
+        </div>
 
-          <div class="card">
-            <div class="card-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-              </svg>
-            </div>
-            <h3>2. U-Shaped Interleaving</h3>
-            <p>
-              Sorts search documents so Rank 1 goes to the head, Rank 2 goes to the tail, and lower-ranked context occupies the low-attention center valley.
-            </p>
-          </div>
+      </div>
+    </section>
 
-          <div class="card">
-            <div class="card-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+    <!-- ===== FEATURES ===== -->
+    <section class="section reveal" id="features" aria-labelledby="features-heading">
+      <div class="container">
+        <div class="section-label">Features</div>
+        <h2 id="features-heading" class="section-title">Everything You Need. Nothing You Don't.</h2>
+        <p class="section-sub">edgenote is a focused, zero-magic library. No agent frameworks, no LLM calls, no cloud
+          dependencies.</p>
+
+        <div class="features-grid">
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
               </svg>
             </div>
-            <h3>3. Centripetal Eviction</h3>
-            <p>
-              Measures real token lengths across native tokenizers (tiktoken, Hugging Face) and evicts low-priority context from the center outward when limits are exceeded.
-            </p>
-          </div>
+            <h3>Provider Agnostic</h3>
+            <p>Outputs standard <code>messages</code> arrays compatible with OpenAI, Anthropic, Groq, and Ollama. Plug
+              into any pipeline.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+            </div>
+            <h3>Exact Token Counting</h3>
+            <p>Uses tiktoken for GPT models and Hugging Face tokenizers for open-weights models. No estimations, no
+              surprises at inference time.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
+              </svg>
+            </div>
+            <h3>BM25 + CrossEncoder Reranking</h3>
+            <p>Built-in document reranking using BM25 sparse retrieval and sentence-transformers CrossEncoder for
+              semantic scoring — ready for any RAG pipeline.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="4" y1="6" x2="20" y2="6" />
+                <line x1="4" y1="12" x2="20" y2="12" />
+                <line x1="4" y1="18" x2="11" y2="18" />
+              </svg>
+            </div>
+            <h3>Semantic Chunking</h3>
+            <p>Intelligently splits long documents into semantically coherent chunks using sentence-transformers, so no
+              critical sentence is split across a context boundary.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" />
+                <line x1="8" y1="21" x2="16" y2="21" />
+                <line x1="12" y1="17" x2="12" y2="21" />
+              </svg>
+            </div>
+            <h3>Minimal API Surface</h3>
+            <p>Three methods: <code>pin()</code>, <code>add()</code>, <code>render()</code>. No subclassing, no config
+              files, no learning curve. Working code in under 5 minutes.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+            </div>
+            <h3>Transparent Results</h3>
+            <p><code>result.tokens</code>, <code>result.pin_overhead</code>, and <code>result.layout</code> give you
+              full visibility into how the prompt was restructured and how many tokens it consumed.</p>
+          </article>
         </div>
       </div>
     </section>
 
-    <!-- Benchmark Matrix Section -->
-    <section class="section reveal" id="benchmark">
+    <!-- ===== BENCHMARK ===== -->
+    <section class="section section-alt reveal" id="benchmark" aria-labelledby="benchmark-heading">
       <div class="container">
-        <div class="section-header">
-          <span class="section-tag">Empirical Benchmark</span>
-          <h2 class="section-title">Needle in a Haystack Verification</h2>
-          <p class="section-desc">
-            Retrieval evaluation across deep context positions comparing a standard baseline prompt against edgenote.
-          </p>
-        </div>
+        <div class="section-label">Empirical Benchmark</div>
+        <h2 id="benchmark-heading" class="section-title">Needle-in-a-Haystack Verification.</h2>
+        <p class="section-sub">
+          A constraint ("Budget is strictly capped at $185,000") was injected at five context depths. Recall was
+          measured by whether the model honoured the constraint in its final answer. edgenote achieved 100% recall at
+          all five positions with a flat +44 token overhead.
+        </p>
 
-        <div class="benchmark-card">
-          <table class="benchmark-table">
-            <thead>
-              <tr>
-                <th>Context Position</th>
-                <th>Baseline Prompt</th>
-                <th>edgenote (Edge Pinning)</th>
-                <th>Token Overhead</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>0.0 (Start / Primacy)</strong></td>
-                <td><span class="status-passed">✓ PASSED</span></td>
-                <td><span class="status-passed">✓ PASSED</span></td>
-                <td><span class="overhead-pill">+44 tokens</span></td>
-              </tr>
-              <tr>
-                <td><strong>0.25 (Quarter Depth)</strong></td>
-                <td><span class="status-failed">✗ FAILED (0% recall)</span></td>
-                <td><span class="status-passed">✓ PASSED (100%)</span></td>
-                <td><span class="overhead-pill">+44 tokens</span></td>
-              </tr>
-              <tr>
-                <td><strong>0.50 (Dead Center)</strong></td>
-                <td><span class="status-failed">✗ FAILED (0% recall)</span></td>
-                <td><span class="status-passed">✓ PASSED (100%)</span></td>
-                <td><span class="overhead-pill">+44 tokens</span></td>
-              </tr>
-              <tr>
-                <td><strong>0.75 (Three-Quarters)</strong></td>
-                <td><span class="status-failed">✗ FAILED (0% recall)</span></td>
-                <td><span class="status-passed">✓ PASSED (100%)</span></td>
-                <td><span class="overhead-pill">+44 tokens</span></td>
-              </tr>
-              <tr>
-                <td><strong>1.0 (End / Recency)</strong></td>
-                <td><span class="status-passed">✓ PASSED</span></td>
-                <td><span class="status-passed">✓ PASSED</span></td>
-                <td><span class="overhead-pill">+44 tokens</span></td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="bench-wrap">
+          <div class="bench-card">
+            <table class="bench-table">
+              <caption class="sr-only">Benchmark results comparing baseline prompt against edgenote across context
+                positions</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Context Position</th>
+                  <th scope="col">Baseline (Linear)</th>
+                  <th scope="col">edgenote (Edge-Pinned)</th>
+                  <th scope="col">Token Overhead</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>0.0 — Start / Primacy</strong></td>
+                  <td><span class="status-pass">✓ PASSED</span></td>
+                  <td><span class="status-pass">✓ PASSED (100%)</span></td>
+                  <td><span class="overhead-tag">+44 tokens</span></td>
+                </tr>
+                <tr>
+                  <td><strong>0.25 — Quarter Depth</strong></td>
+                  <td><span class="status-fail">✗ FAILED (0% recall)</span></td>
+                  <td><span class="status-pass">✓ PASSED (100%)</span></td>
+                  <td><span class="overhead-tag">+44 tokens</span></td>
+                </tr>
+                <tr>
+                  <td><strong>0.50 — Dead Center</strong></td>
+                  <td><span class="status-fail">✗ FAILED (0% recall)</span></td>
+                  <td><span class="status-pass">✓ PASSED (100%)</span></td>
+                  <td><span class="overhead-tag">+44 tokens</span></td>
+                </tr>
+                <tr>
+                  <td><strong>0.75 — Three-Quarter Depth</strong></td>
+                  <td><span class="status-fail">✗ FAILED (0% recall)</span></td>
+                  <td><span class="status-pass">✓ PASSED (100%)</span></td>
+                  <td><span class="overhead-tag">+44 tokens</span></td>
+                </tr>
+                <tr>
+                  <td><strong>1.0 — End / Recency</strong></td>
+                  <td><span class="status-pass">✓ PASSED</span></td>
+                  <td><span class="status-pass">✓ PASSED (100%)</span></td>
+                  <td><span class="overhead-tag">+44 tokens</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <aside class="bench-summary" aria-label="Benchmark summary">
+            <div class="bench-stat-block">
+              <span class="bench-big">3 / 5</span>
+              <span class="bench-label">positions where baseline <strong>fails completely</strong></span>
+            </div>
+            <div class="bench-stat-block bench-stat-block--success">
+              <span class="bench-big">5 / 5</span>
+              <span class="bench-label">positions where edgenote <strong>succeeds at 100%</strong></span>
+            </div>
+            <p class="bench-note">Benchmark run with GPT-4o-mini on a 4,000-token haystack. Code available in the <a
+                href="https://github.com/tareqshahalam" target="_blank" rel="noopener noreferrer">GitHub repository</a>.
+            </p>
+          </aside>
         </div>
       </div>
     </section>
 
-    <!-- Quickstart Section -->
-    <section class="section reveal" id="quickstart">
+    <!-- ===== QUICKSTART ===== -->
+    <section class="section reveal" id="quickstart" aria-labelledby="quickstart-heading">
       <div class="container">
-        <div class="section-header">
-          <span class="section-tag">Implementation</span>
-          <h2 class="section-title">Minimal Developer Ergonomics</h2>
-          <p class="section-desc">
-            Construct prompts defensively in four lines of Python without complicated pipeline dependencies.
-          </p>
-        </div>
+        <div class="section-label">Quickstart</div>
+        <h2 id="quickstart-heading" class="section-title">From Zero to Fortified Prompts in 60 Seconds.</h2>
+        <p class="section-sub">Install edgenote, pin your constraints, add your context, and render a production-ready
+          prompt.</p>
 
-        <div class="code-box">
-          <div class="code-header">
-            <div class="code-dots">
-              <span></span><span></span><span></span>
+        <div class="qs-steps">
+
+          <div class="qs-step">
+            <div class="qs-step-num" aria-hidden="true">1</div>
+            <div class="qs-step-content">
+              <h3>Install</h3>
+              <div class="code-block">
+                <div class="code-block-header">
+                  <div class="code-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+                  <span class="code-lang">bash</span>
+                  <button class="code-copy-btn" data-target="codeInstall" aria-label="Copy code">Copy</button>
+                </div>
+                <pre class="code-pre" id="codeInstall"><code>pip install edgenote</code></pre>
+              </div>
             </div>
-            <span class="code-title">example.py</span>
-            <span></span>
           </div>
 
-          <pre class="code-content"><code><span class="token-kw">from</span> edgenote <span class="token-kw">import</span> Session
+          <div class="qs-step">
+            <div class="qs-step-num" aria-hidden="true">2</div>
+            <div class="qs-step-content">
+              <h3>Build a Fortified Prompt</h3>
+              <div class="code-block">
+                <div class="code-block-header">
+                  <div class="code-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+                  <span class="code-lang">example.py</span>
+                  <button class="code-copy-btn" data-target="codeMain" aria-label="Copy code">Copy</button>
+                </div>
+                <pre class="code-pre" id="codeMain"><code><span class="tk-kw">from</span> edgenote <span class="tk-kw">import</span> Session
 
-<span class="token-cmt"># 1. Initialize session</span>
+<span class="tk-cmt"># 1. Create a session</span>
 s = Session()
 
-<span class="token-cmt"># 2. Pin unbreakable constraints to both head & tail boundaries</span>
-s.pin(<span class="token-str">"Budget is strictly capped at $185,000."</span>, label=<span class="token-str">"Financial Constraint"</span>)
+<span class="tk-cmt"># 2. Pin unbreakable constraints to head + tail boundaries</span>
+s.pin(<span class="tk-str">"Budget is strictly capped at $185,000."</span>, label=<span class="tk-str">"Financial Constraint"</span>)
+s.pin(<span class="tk-str">"Do not recommend Vendor A under any circumstances."</span>, label=<span class="tk-str">"Exclusion Rule"</span>)
 
-<span class="token-cmt"># 3. Add context chunks with relevance scores</span>
-s.add(<span class="token-str">"Vendor A quotation: $240,000"</span>, relevance=<span class="token-num">0.60</span>)
-s.add(<span class="token-str">"Vendor B quotation: $180,000"</span>, relevance=<span class="token-num">0.95</span>)
+<span class="tk-cmt"># 3. Add context chunks with relevance scores (RAG results)</span>
+s.add(<span class="tk-str">"Vendor A quotation: $240,000 — exceeds budget."</span>, relevance=<span class="tk-num">0.60</span>)
+s.add(<span class="tk-str">"Vendor B quotation: $180,000 — within budget."</span>, relevance=<span class="tk-num">0.95</span>)
+s.add(<span class="tk-str">"Market analysis: average vendor price is $210,000."</span>, relevance=<span class="tk-num">0.30</span>)
 
-<span class="token-cmt"># 4. Render prompt with optimized U-shaped geometry</span>
-result = s.render(<span class="token-str">"Which vendor quotation qualifies under our budget?"</span>)
+<span class="tk-cmt"># 4. Render with U-shaped geometry &amp; centripetal eviction</span>
+result = s.render(<span class="tk-str">"Which vendor quotation qualifies under our budget?"</span>)
 
-<span class="token-fn">print</span>(result.text)
-<span class="token-fn">print</span>(f<span class="token-str">"Tokens: {result.tokens} | Pin overhead: +{result.pin_overhead}"</span>)
+<span class="tk-fn">print</span>(result.text)
+<span class="tk-fn">print</span>(f<span class="tk-str">"Tokens: {result.tokens} | Pin overhead: +{result.pin_overhead}"</span>)
 
-<span class="token-cmt"># Ready-to-send messages for OpenAI, Anthropic, Groq, or Ollama</span>
+<span class="tk-cmt"># Plug directly into OpenAI, Anthropic, Groq, or Ollama</span>
 messages = result.to_messages()</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="qs-step">
+            <div class="qs-step-num" aria-hidden="true">3</div>
+            <div class="qs-step-content">
+              <h3>Send to Your LLM</h3>
+              <div class="code-block">
+                <div class="code-block-header">
+                  <div class="code-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+                  <span class="code-lang">openai_example.py</span>
+                  <button class="code-copy-btn" data-target="codeOpenAI" aria-label="Copy code">Copy</button>
+                </div>
+                <pre class="code-pre" id="codeOpenAI"><code><span class="tk-kw">import</span> openai
+<span class="tk-kw">from</span> edgenote <span class="tk-kw">import</span> Session
+
+s = Session()
+s.pin(<span class="tk-str">"Budget cap: $185,000."</span>)
+s.add(<span class="tk-str">"Vendor B: $180,000"</span>, relevance=<span class="tk-num">0.95</span>)
+
+result = s.render(<span class="tk-str">"Which vendor fits our budget?"</span>)
+
+client = openai.OpenAI()
+response = client.chat.completions.create(
+    model=<span class="tk-str">"gpt-4o"</span>,
+    messages=result.to_messages()  <span class="tk-cmt"># drop-in replacement</span>
+)
+<span class="tk-fn">print</span>(response.choices[<span class="tk-num">0</span>].message.content)</code></pre>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
+
+    <!-- ===== COMPATIBILITY ===== -->
+    <section class="section section-alt reveal" id="compatibility" aria-labelledby="compat-heading">
+      <div class="container">
+        <div class="section-label">Compatibility</div>
+        <h2 id="compat-heading" class="section-title">Works With Your Entire Stack.</h2>
+        <p class="section-sub">edgenote produces standard message arrays. If your LLM client accepts
+          <code>messages</code>, edgenote works with it.
+        </p>
+
+        <div class="compat-grid">
+          <div class="compat-card">
+            <div class="compat-logo" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z" />
+              </svg>
+            </div>
+            <span class="compat-name">OpenAI</span>
+          </div>
+          <div class="compat-card">
+            <div class="compat-logo" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M17.3 2.001H6.7C4.149 2.001 2 4.15 2 6.701v10.598C2 19.851 4.149 22 6.7 22h10.6c2.551 0 4.7-2.149 4.7-4.701V6.701C22 4.15 19.851 2.001 17.3 2.001zM12 17.5c-3.033 0-5.5-2.467-5.5-5.5S8.967 6.5 12 6.5s5.5 2.467 5.5 5.5-2.467 5.5-5.5 5.5zm5.75-10a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z" />
+              </svg>
+            </div>
+            <span class="compat-name">Anthropic</span>
+          </div>
+          <div class="compat-card">
+            <div class="compat-logo" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M8.562 2.119C4.832 2.847 2 6.093 2 10c0 .898.142 1.766.407 2.58L6.5 8.5l2 4 4-8 2 4 2.5-2.5C16.488 5.1 14.905 3.498 12.919 2.546A8.016 8.016 0 0 0 12 2.08a8.08 8.08 0 0 0-3.438.039zM2.63 14.13C3.89 17.533 7.17 20 11.053 20H13c2.21 0 4.21-.895 5.657-2.343A7.975 7.975 0 0 0 21 12c0-.37-.025-.734-.074-1.09L17 15l-2-4-4 8-2-4-3.5 3.5c-.333-.406-.635-.839-.89-1.303l-2.986 2.936a.069.069 0 0 1-.014-.003z" />
+              </svg>
+            </div>
+            <span class="compat-name">Groq</span>
+          </div>
+          <div class="compat-card">
+            <div class="compat-logo" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm0 2c1.93 0 3.71.62 5.17 1.66L5.66 17.17A7.96 7.96 0 0 1 4 12c0-4.41 3.59-8 8-8zm0 16c-1.93 0-3.71-.62-5.17-1.66L18.34 6.83A7.96 7.96 0 0 1 20 12c0 4.41-3.59 8-8 8z" />
+              </svg>
+            </div>
+            <span class="compat-name">Ollama</span>
+          </div>
+          <div class="compat-card">
+            <div class="compat-logo" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
+              </svg>
+            </div>
+            <span class="compat-name">Python 3.10+</span>
+          </div>
+          <div class="compat-card">
+            <div class="compat-logo" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M11.9 1.036c-.015-.986-1.26-1.41-1.874-.637L.764 12.05C.33 12.59.722 13.39 1.4 13.39h9.4l-.12 9.574c.015.986 1.261 1.41 1.875.637l9.262-11.652c.434-.54.042-1.34-.636-1.34h-9.4l.12-9.574z" />
+              </svg>
+            </div>
+            <span class="compat-name">tiktoken</span>
+          </div>
+          <div class="compat-card">
+            <div class="compat-logo" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
+              </svg>
+            </div>
+            <span class="compat-name">Hugging Face</span>
+          </div>
+          <div class="compat-card">
+            <div class="compat-logo" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                  d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+              </svg>
+            </div>
+            <span class="compat-name">LangChain Ready</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section class="section reveal" id="faq" aria-labelledby="faq-heading">
+      <div class="container">
+        <div class="section-label">FAQ</div>
+        <h2 id="faq-heading" class="section-title">Frequently Asked Questions.</h2>
+
+        <div class="faq-list" role="list">
+
+          <details class="faq-item" role="listitem">
+            <summary class="faq-q">Does edgenote make any LLM API calls?</summary>
+            <div class="faq-a">
+              <p>No. edgenote is a pure prompt-structuring library. It only rearranges text and counts tokens on your
+                local machine. It has no network dependencies at runtime and never sends your data anywhere.</p>
+            </div>
+          </details>
+
+          <details class="faq-item" role="listitem">
+            <summary class="faq-q">Does it work with any LLM, not just OpenAI?</summary>
+            <div class="faq-a">
+              <p>Yes. edgenote outputs a standard <code>messages</code> list (the OpenAI chat format). This format is
+                accepted by OpenAI, Anthropic (via a thin adapter), Groq, Ollama, and any OpenAI-compatible API. The
+                prompt geometry it applies is model-agnostic — all decoder-only transformers exhibit the U-shaped
+                attention bias it compensates for.</p>
+            </div>
+          </details>
+
+          <details class="faq-item" role="listitem">
+            <summary class="faq-q">What is the actual token overhead of edge pinning?</summary>
+            <div class="faq-a">
+              <p>The overhead is exactly twice the token length of your pinned constraints (once at the head, once at
+                the echo at the tail) plus a small formatting wrapper. In the benchmark scenario with two constraints,
+                this was consistently +44 tokens regardless of total context length. The overhead does not scale with
+                context size.</p>
+            </div>
+          </details>
+
+          <details class="faq-item" role="listitem">
+            <summary class="faq-q">How is edgenote different from a system prompt?</summary>
+            <div class="faq-a">
+              <p>A system prompt is placed only at the head of the context. edgenote <em>also</em> echoes your
+                constraints at the tail — immediately before generation — where recency bias is strongest. It also
+                restructures all intermediate context chunks using U-shaped interleaving, which a system prompt alone
+                cannot do.</p>
+            </div>
+          </details>
+
+          <details class="faq-item" role="listitem">
+            <summary class="faq-q">What Python versions are supported?</summary>
+            <div class="faq-a">
+              <p>edgenote requires Python 3.10 or higher. It is tested against Python 3.10, 3.11, and 3.12.</p>
+            </div>
+          </details>
+
+          <details class="faq-item" role="listitem">
+            <summary class="faq-q">Can I use edgenote without the reranking dependency?</summary>
+            <div class="faq-a">
+              <p>Yes. If you supply relevance scores manually (e.g., from your own retriever), edgenote does not need
+                sentence-transformers. The core edge pinning and U-shaped interleaving work on raw relevance floats. You
+                only need the CrossEncoder dependency if you want edgenote to compute relevance scores internally.</p>
+            </div>
+          </details>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CTA ===== -->
+    <section class="section-cta reveal" aria-labelledby="cta-heading">
+      <div class="container">
+        <div class="cta-card">
+          <h2 id="cta-heading" class="cta-title">Start Building Reliable LLM Applications.</h2>
+          <p class="cta-sub">Install edgenote in 30 seconds. Fix the Lost in the Middle problem permanently.</p>
+          <div class="cta-actions">
+            <div class="install-bar install-bar--dark" id="ctaInstallBar">
+              <span class="install-prefix" aria-hidden="true">$</span>
+              <code>pip install edgenote</code>
+              <button class="copy-btn copy-btn--dark" id="ctaCopyBtn" aria-label="Copy pip install edgenote">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  aria-hidden="true">
+                  <rect x="9" y="9" width="13" height="13" rx="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <a href="https://pypi.org/project/edgenote/" target="_blank" rel="noopener noreferrer"
+              class="btn-primary btn-lg">
+              View on PyPI →
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container footer-content">
-      <div style="display: flex; align-items: center; gap: 0.85rem;">
-        <img src="favicon.png" alt="edgenote icon" style="width: 24px; height: 24px; border-radius: 4px; object-fit: contain;">
-        <p>edgenote — Developed by <a href="https://tareqshahalam.is-a.dev/" target="_blank" rel="noopener noreferrer" style="color: var(--text-primary); text-decoration: none; font-weight: 500;">Md Tareq Shah Alam</a></p>
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" role="contentinfo">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="favicon.png" alt="edgenote icon" class="footer-icon" width="22" height="22">
+        <div>
+          <p class="footer-name">edgenote</p>
+          <p class="footer-tagline">Prompt geometry for reliable LLMs.</p>
+        </div>
       </div>
 
-      <ul class="footer-links">
-        <li><a href="https://pypi.org/project/edgenote/" target="_blank" rel="noopener noreferrer">PyPI</a></li>
-        <li><a href="https://www.linkedin.com/in/md-tareq-shah-alam/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
-        <li><a href="https://github.com/tareqshahalam" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-      </ul>
+      <nav class="footer-nav" aria-label="Footer navigation">
+        <div class="footer-col">
+          <h4 class="footer-col-title">Package</h4>
+          <ul>
+            <li><a href="https://pypi.org/project/edgenote/" target="_blank" rel="noopener noreferrer">PyPI</a></li>
+            <li><a href="https://github.com/tareqshahalam" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+            <li><a href="#benchmark">Benchmark</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-col-title">Docs</h4>
+          <ul>
+            <li><a href="#quickstart">Quickstart</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#faq">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-col-title">Author</h4>
+          <ul>
+            <li><a href="https://tareqshahalam.is-a.dev/" target="_blank" rel="noopener noreferrer">Portfolio</a></li>
+            <li><a href="https://www.linkedin.com/in/md-tareq-shah-alam/" target="_blank"
+                rel="noopener noreferrer">LinkedIn</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+
+    <div class="container footer-bottom">
+      <p>Built by <a href="https://tareqshahalam.is-a.dev/" target="_blank" rel="noopener noreferrer">Md Tareq Shah
+          Alam</a>. Released on <a href="https://pypi.org/project/edgenote/" target="_blank"
+          rel="noopener noreferrer">PyPI</a>.</p>
+      <p>Inspired by Liu et al., 2023 — <em>"Lost in the Middle: How Language Models Use Long Contexts"</em></p>
     </div>
   </footer>
 
-  <!-- Scripts -->
   <script src="js/main.js"></script>
 </body>
+
 </html>
